@@ -1,4 +1,4 @@
-const CACHE_NAME = 'senate-attendance-v1';
+const CACHE_NAME = 'senate-attendance-v2';
 const ASSETS = [
   './',
   './index.html',
