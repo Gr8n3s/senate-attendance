@@ -1,9 +1,19 @@
 // js/reports-ui.js
-import { getSenators, getSittings, getSenatorAttendance, getRecordsForSenator } from './storage.js';
+import { getSenators, getSittings, getSenatorAttendance, getRecordsForSenator, getAllData, getLastExportAt, markExported, importFullLogRows } from './storage.js';
 import { renderChecklist } from './checklist-ui.js';
+import { toCSV, parseCSV, fullLogRows, parseFullLogRows, summaryRows } from './csv.js';
 
 export function renderReportsScreen(container) {
   container.innerHTML = `
+    <div id="backup-note" class="subtitle"></div>
+    <div class="section">
+      <button id="export-log-btn" class="mock-button">Export Full Log (CSV)</button>
+      <button id="export-summary-btn" class="mock-button">Export Summary (CSV)</button>
+      <label class="mock-button" style="display:block;text-align:center;">
+        Import Backup CSV
+        <input id="import-input" type="file" accept=".csv" style="display:none;" />
+      </label>
+    </div>
     <h3>Senators</h3>
     <div id="senator-list" class="section"></div>
     <h3>Past Sittings</h3>
@@ -11,8 +21,47 @@ export function renderReportsScreen(container) {
     <div id="detail-box"></div>
   `;
 
+  renderBackupNote();
   renderSenatorList();
   renderSittingList();
+
+  container.querySelector('#export-log-btn').addEventListener('click', () => {
+    const data = getAllData();
+    downloadCSV(toCSV(fullLogRows(getSenators({ includeInactive: true }), getSittings(), data.records)), 'senate-attendance-log.csv');
+  });
+  container.querySelector('#export-summary-btn').addEventListener('click', () => {
+    const data = getAllData();
+    downloadCSV(toCSV(summaryRows(getSenators({ includeInactive: true }), data.records)), 'senate-attendance-summary.csv');
+  });
+  container.querySelector('#import-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const text = await file.text();
+    importFullLogRows(parseFullLogRows(parseCSV(text)));
+    alert('Import complete.');
+    renderSenatorList();
+    renderSittingList();
+  });
+
+  function renderBackupNote() {
+    const box = container.querySelector('#backup-note');
+    const last = getLastExportAt();
+    if (!last) { box.textContent = 'No backup exported yet.'; return; }
+    const days = Math.floor((Date.now() - new Date(last).getTime()) / 86400000);
+    box.textContent = `Last backup exported: ${days === 0 ? 'today' : days + ' day(s) ago'}.`;
+  }
+
+  function downloadCSV(text, filename) {
+    const blob = new Blob([text], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+    markExported();
+    renderBackupNote();
+  }
 
   function renderSenatorList() {
     const box = container.querySelector('#senator-list');
