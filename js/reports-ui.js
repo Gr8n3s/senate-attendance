@@ -1,7 +1,7 @@
 // js/reports-ui.js
 import { getSenators, getSittings, getSenatorAttendance, getRecordsForSenator, getAllData, getLastExportAt, markExported, importFullLogRows } from './storage.js';
 import { renderChecklist } from './checklist-ui.js';
-import { toCSV, parseCSV, fullLogRows, parseFullLogRows, summaryRows } from './csv.js';
+import { toCSV, parseCSV, fullLogRows, parseFullLogRows, summaryRows, LOG_HEADER } from './csv.js';
 
 export function renderReportsScreen(container) {
   container.innerHTML = `
@@ -36,11 +36,24 @@ export function renderReportsScreen(container) {
   container.querySelector('#import-input').addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const text = await file.text();
-    importFullLogRows(parseFullLogRows(parseCSV(text)));
-    alert('Import complete.');
-    renderSenatorList();
-    renderSittingList();
+    try {
+      const text = await file.text();
+      const rows = parseCSV(text);
+      const header = rows[0] || [];
+      const headerMatches = LOG_HEADER.length === header.length && LOG_HEADER.every((col, i) => col === header[i]);
+      if (!headerMatches) {
+        alert('That doesn\'t look like a Full Log backup CSV (exported via "Export Full Log (CSV)"). Import cancelled.');
+        return;
+      }
+      importFullLogRows(parseFullLogRows(rows));
+      alert('Import complete.');
+      renderSenatorList();
+      renderSittingList();
+    } catch (err) {
+      alert('Import failed: the file could not be read as a valid backup CSV.');
+    } finally {
+      e.target.value = '';
+    }
   });
 
   function renderBackupNote() {

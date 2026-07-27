@@ -37,7 +37,7 @@ export function parseCSV(text) {
   return rows.filter((r) => !(r.length === 1 && r[0] === ''));
 }
 
-const LOG_HEADER = ['Date', 'Type', 'Senator', 'Position', 'Level', 'Department', 'Status', 'Note'];
+export const LOG_HEADER = ['Date', 'Type', 'Senator', 'Position', 'Level', 'Department', 'Status', 'Note'];
 
 export function fullLogRows(senators, sittings, records) {
   const senatorById = new Map(senators.map((s) => [s.id, s]));
