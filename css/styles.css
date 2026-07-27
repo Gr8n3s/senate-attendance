@@ -1,0 +1,62 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: #0b1220;
+  color: #eef1f7;
+  padding-bottom: 72px;
+}
+.app-header {
+  padding: 16px;
+  font-weight: 600;
+  text-align: center;
+  background: #1c2b4a;
+}
+.screen { display: none; padding: 12px; }
+.screen.active { display: block; }
+.section { margin-bottom: 16px; }
+.card {
+  border: 1px solid #2c3b5a;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 8px;
+}
+.subtitle { color: #9aa5c0; font-size: 13px; }
+.badge {
+  display: inline-block;
+  background: #3a4d7a;
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 12px;
+  margin-left: 6px;
+}
+.mock-input, .mock-button, select {
+  width: 100%;
+  padding: 10px;
+  margin: 4px 0;
+  border-radius: 8px;
+  border: 1px solid #2c3b5a;
+  background: #131c30;
+  color: #eef1f7;
+  font-size: 14px;
+}
+.mock-button { cursor: pointer; text-align: center; }
+.status-btn { width: auto; display: inline-block; margin-right: 8px; }
+.note-input { display: block; margin-top: 6px; }
+.tab-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  display: flex;
+  background: #1c2b4a;
+  border-top: 1px solid #2c3b5a;
+}
+.tab-btn {
+  flex: 1;
+  padding: 10px 0;
+  text-align: center;
+  background: none;
+  border: none;
+  color: #9aa5c0;
+  font-size: 12px;
+}
+.tab-btn.active { color: #ffffff; font-weight: 600; }

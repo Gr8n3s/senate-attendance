@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Senate Attendance</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1c2b4a">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="app-header">Senate Attendance</header>
+
+  <main id="screen-attendance" class="screen active"></main>
+  <main id="screen-roster" class="screen"></main>
+  <main id="screen-reports" class="screen"></main>
+
+  <nav class="tab-bar">
+    <button class="tab-btn active" data-tab="attendance">&#128203;<br>Attend</button>
+    <button class="tab-btn" data-tab="roster">&#128101;<br>Roster</button>
+    <button class="tab-btn" data-tab="reports">&#128202;<br>Reports</button>
+  </nav>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
