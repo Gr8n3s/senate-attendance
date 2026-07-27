@@ -5,14 +5,20 @@ const STATUSES = ['present', 'absent', 'excused'];
 const STATUS_LABEL = { present: 'Present', absent: 'Absent', excused: 'Excused' };
 
 export function renderChecklist(container, sitting, onSaved) {
-  const senators = getSenators();
+  const activeSenators = getSenators();
+  const existingForRoster = getRecordsForSitting(sitting.id);
+  const existingIds = new Set(existingForRoster.map((r) => r.senatorId));
+  const inactiveButRecorded = getSenators({ includeInactive: true }).filter(
+    (s) => !s.active && existingIds.has(s.id)
+  );
+  const senators = activeSenators.concat(inactiveButRecorded);
 
   if (senators.length === 0) {
     container.innerHTML = '<p class="subtitle">No senators on the roster yet. Add senators in the Roster tab first.</p>';
     return;
   }
 
-  const existing = getRecordsForSitting(sitting.id);
+  const existing = existingForRoster;
   const state = new Map(senators.map((s) => {
     const rec = existing.find((r) => r.senatorId === s.id);
     return [s.id, { status: rec ? rec.status : 'present', note: rec ? rec.note : '' }];
