@@ -1,7 +1,9 @@
 // js/roster-ui.js
-import { getSenators, addSenator, updateSenator, deactivateSenator } from './storage.js';
+import { getSenators, addSenator, updateSenator, deactivateSenator, deleteSenator } from './storage.js';
 
 const POSITIONS = ['none', 'Senate President', 'Deputy Senate President', 'Chief Whip', 'Senate Scribe'];
+const LEVELS = ['100L', '200L', '300L', '400L', '500L'];
+const DEPARTMENTS = ['Information Systems', 'Cybersecurity', 'Software Engineering', 'Computer Science', 'Information Technology'];
 
 export function renderRosterScreen(container) {
   container.innerHTML = `
@@ -32,6 +34,7 @@ export function renderRosterScreen(container) {
         <div class="subtitle">${escapeHtml(s.level || '')} &middot; ${escapeHtml(s.department || '')}</div>
         <button class="mock-button edit-btn" data-id="${s.id}">Edit</button>
         <button class="mock-button remove-btn" data-id="${s.id}">Remove</button>
+        <button class="mock-button delete-btn" data-id="${s.id}">Delete Permanently</button>
       </div>
     `).join('') || '<p class="subtitle">No senators yet. Add one below.</p>';
 
@@ -46,6 +49,15 @@ export function renderRosterScreen(container) {
         }
       });
     });
+    list.querySelectorAll('.delete-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const senator = senators.find((s) => s.id === btn.dataset.id);
+        if (confirm(`Delete ${senator.name} FOREVER? This erases all their attendance history too. This cannot be undone.`)) {
+          deleteSenator(btn.dataset.id);
+          renderList(search.value);
+        }
+      });
+    });
   }
 
   function showForm(senator = null) {
@@ -55,8 +67,12 @@ export function renderRosterScreen(container) {
       <select id="f-position" class="mock-input">
         ${POSITIONS.map((p) => `<option value="${p}" ${senator && senator.position === p ? 'selected' : ''}>${p === 'none' ? 'No position' : p}</option>`).join('')}
       </select>
-      <input id="f-level" class="mock-input" placeholder="Level (e.g. 300L)" value="${senator ? escapeHtml(senator.level || '') : ''}" />
-      <input id="f-department" class="mock-input" placeholder="Department" value="${senator ? escapeHtml(senator.department || '') : ''}" />
+      <select id="f-level" class="mock-input">
+        ${buildOptions(LEVELS, senator ? senator.level : '', 'Level')}
+      </select>
+      <select id="f-department" class="mock-input">
+        ${buildOptions(DEPARTMENTS, senator ? senator.department : '', 'Department')}
+      </select>
       <button id="f-save" class="mock-button">Save</button>
     `;
     formBox.querySelector('#f-save').addEventListener('click', () => {
@@ -65,8 +81,8 @@ export function renderRosterScreen(container) {
       const payload = {
         name,
         position: formBox.querySelector('#f-position').value,
-        level: formBox.querySelector('#f-level').value.trim(),
-        department: formBox.querySelector('#f-department').value.trim(),
+        level: formBox.querySelector('#f-level').value,
+        department: formBox.querySelector('#f-department').value,
       };
       if (senator) updateSenator(senator.id, payload);
       else addSenator(payload);
@@ -79,6 +95,17 @@ export function renderRosterScreen(container) {
   search.addEventListener('input', () => renderList(search.value));
 
   renderList();
+}
+
+function buildOptions(fixedList, currentValue, placeholder) {
+  const options = [`<option value="">${placeholder}</option>`];
+  for (const value of fixedList) {
+    options.push(`<option value="${escapeHtml(value)}" ${value === currentValue ? 'selected' : ''}>${escapeHtml(value)}</option>`);
+  }
+  if (currentValue && !fixedList.includes(currentValue)) {
+    options.push(`<option value="${escapeHtml(currentValue)}" selected>${escapeHtml(currentValue)}</option>`);
+  }
+  return options.join('');
 }
 
 function escapeHtml(str) {

@@ -43,6 +43,13 @@ export function deactivateSenator(id) {
   return updateSenator(id, { active: false });
 }
 
+export function deleteSenator(id) {
+  const data = loadData();
+  data.senators = data.senators.filter((s) => s.id !== id);
+  data.records = data.records.filter((r) => r.senatorId !== id);
+  saveData(data);
+}
+
 export function getSittings() {
   const data = loadData();
   return data.sittings.slice().sort((a, b) => b.date.localeCompare(a.date));
