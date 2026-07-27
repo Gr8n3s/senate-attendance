@@ -1,5 +1,6 @@
 import { renderRosterScreen } from './roster-ui.js';
 import { renderAttendanceScreen } from './attendance-ui.js';
+import { renderReportsScreen } from './reports-ui.js';
 
 const screens = {
   attendance: document.getElementById('screen-attendance'),
@@ -7,9 +8,7 @@ const screens = {
   reports: document.getElementById('screen-reports'),
 };
 
-screens.reports.textContent = 'reports screen (coming soon)';
-
-const rendered = { roster: false, attendance: false };
+const rendered = { roster: false, attendance: false, reports: false };
 
 function showTab(name) {
   for (const [key, el] of Object.entries(screens)) {
@@ -25,6 +24,10 @@ function showTab(name) {
   if (name === 'attendance' && !rendered.attendance) {
     renderAttendanceScreen(screens.attendance);
     rendered.attendance = true;
+  }
+  if (name === 'reports') {
+    renderReportsScreen(screens.reports);
+    rendered.reports = true;
   }
 }
 
